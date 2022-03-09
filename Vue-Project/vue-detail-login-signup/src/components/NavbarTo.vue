@@ -2,11 +2,11 @@
   <div class="navbar">
     <nav>
       <h1>
-        <router-link :to="{ name: 'SignUpTo' }">asdas</router-link>
+        <router-link :to="{ name: 'SignUpTo' }">Enoca</router-link>
       </h1>
       <div class="links">
-          <router-link class="btn" :to="{ name: 'SignUpTo' }">Signup</router-link>
-          <router-link class="btn" :to="{ name: 'LoginTo' }">Login</router-link>
+          <router-link class="tags" :to="{ name: 'SignUpTo' }">Signup</router-link>
+          <router-link class="tags" :to="{ name: 'LoginTo' }">Login</router-link>
         </div>
     </nav>
   </div>

@@ -1,12 +1,25 @@
 <template>
   <form @submit.prevent="formLoginSubmit">
     <h3>Login</h3>
-    <input type="email" placeholder="Email" v-model.trim="email" :class="{ errorborder: error.email != null }" />
+    <input
+      type="email"
+      placeholder="Email Adresiniz"
+      v-model.trim="email"
+      :class="{ errorborder: error.email != null }"
+    />
     <div v-if="error.email" class="error">{{ error.email }}</div>
     <div class="password-area">
-      <input :type="passwordType" placeholder="Password" v-model.trim="password" :class="{ errorborder: error.pass != null }" />
+      <input
+        :type="passwordType"
+        placeholder="Şifreniz"
+        v-model.trim="password"
+        :class="{ errorborder: error.pass != null }"
+      />
       <div class="showpassword-area" @click="showPassword">
-        <img v-if="passwordType == 'password'" src="../../public/register-password-hide.svg" />
+        <img
+          v-if="passwordType == 'password'"
+          src="../../public/register-password-hide.svg"
+        />
         <img v-else src="../../public/register-password-show.svg" />
       </div>
     </div>
@@ -39,30 +52,26 @@ export default {
     const passwordType = ref("password");
 
     const formLoginSubmit = () => {
-      if (emailCheck) {
-        error.value.email = "lütfen bu alanı boş bırakmayın";
+      if (emailvalidator(email.value)) {
+        error.value.email = emailvalidator(email.value);
       }
       if (password.value == "") {
-        error.value.pass = "lütfen bu alanı boş bırakmayınız";
+        error.value.pass = "Lütfen şifre kısmını boş bırakmayın";
       } else {
         console.log(email.value, password.value);
+        return true
       }
     };
     const showPassword = () => {
-      passwordType.value = passwordType.value === "password" ? "text" : "password";
+      passwordType.value =
+        passwordType.value === "password" ? "text" : "password";
     };
 
     const emailCheck = watch(email, function (newValue) {
       if (newValue === email.value) {
         const emailValidationError = emailvalidator(email.value);
         if (emailValidationError) error.value.email = emailValidationError;
-        else error.value.email = null
-
-        // if (!email.value.match(/^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/)) {
-        //   error.value.email = "geçerli bir email giriniz";
-        // } else {
-        //   error.value.email = null;
-        // }
+        else error.value.email = null;
       }
     });
     const passwordCheck = watch(password, function (newValue) {
@@ -75,7 +84,16 @@ export default {
       }
     });
 
-    return { email, password, passwordType, error, showPassword, emailCheck, passwordCheck, formLoginSubmit };
+    return {
+      email,
+      password,
+      passwordType,
+      error,
+      showPassword,
+      emailCheck,
+      passwordCheck,
+      formLoginSubmit,
+    };
   },
 };
 </script>
@@ -88,6 +106,9 @@ export default {
   align-items: center;
   margin-bottom: 10px;
 }
+.login-lastrow span:first-child {
+  color: #f2821a;
+}
 .login-lastrow span:first-child:hover {
   cursor: pointer;
   text-decoration: underline;
@@ -96,6 +117,9 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+.rememberme span {
+  font-weight: 700;
 }
 .rememberme input {
   width: 35px;

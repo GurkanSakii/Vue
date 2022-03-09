@@ -3,46 +3,96 @@
     <h3>Sign up</h3>
     <div class="first-row">
       <div>
-        <input type="text" placeholder="First name" v-model.trim="firstName" :class="{ errorborder: error.name != null }" />
+        <input
+          type="text"
+          placeholder="Adınız"
+          v-model.trim="firstName"
+          :class="{ errorborder: error.name != null }"
+        />
         <div v-if="error.name" class="error">{{ error.name }}</div>
       </div>
       <div>
-        <input type="text" placeholder="Last name" v-model.trim="surName" :class="{ errorborder: error.surname != null }" />
+        <input
+          type="text"
+          placeholder="Soyadınız"
+          v-model.trim="surName"
+          :class="{ errorborder: error.surname != null }"
+        />
         <div v-if="error.surname" class="error">{{ error.surname }}</div>
       </div>
     </div>
-    <input type="email" placeholder="Email" v-model.trim="email" :class="{ errorborder: error.email != null }" />
+    <input
+      type="email"
+      placeholder="E-Posta Adresiniz"
+      v-model.trim="email"
+      :class="{ errorborder: error.email != null }"
+    />
     <div v-if="error.email" class="error">{{ error.email }}</div>
-    <input type="tel" placeholder="Telephone" v-model.trim="phoneNumber" :class="{ errorborder: error.phone != null }" />
+    <input
+      type="tel"
+      placeholder="Telefon Numaranız"
+      v-model.trim="phoneNumber"
+      :class="{ errorborder: error.phone != null }"
+    />
     <div v-if="error.phone" class="error">{{ error.phone }}</div>
     <div class="password-area">
-      <input placeholder="Password" :type="signPasswordType" v-model.trim="password" :class="{ errorborder: error.password != null }" />
+      <input
+        placeholder="Şifreniz"
+        :type="signPasswordType"
+        v-model.trim="password"
+        @blur="passwordCompare"
+        :class="{ errorborder: error.password != null }"
+      />
       <div @click="showSignPassword">
-        <img v-if="signPasswordType == 'password'" src="../../public/register-password-hide.svg" />
+        <img
+          v-if="signPasswordType == 'password'"
+          src="../../public/register-password-hide.svg"
+        />
         <img v-else src="../../public/register-password-show.svg" />
       </div>
     </div>
     <div v-if="error.password" class="error">{{ error.password }}</div>
     <div class="password-area">
-      <input placeholder="rePassword" :type="signRePasswordType" v-model.trim="rePassword" :class="{ errorborder: error.repassword != null }" />
+      <input
+        placeholder="Şifre Onayı"
+        :type="signRePasswordType"
+        v-model.trim="rePassword"
+        @blur="passwordCompare"
+        :class="{ errorborder: error.repassword != null }"
+      />
       <div @click="showSignRePassword">
-        <img v-if="signRePasswordType == 'password'" src="../../public/register-password-hide.svg" />
+        <img
+          v-if="signRePasswordType == 'password'"
+          src="../../public/register-password-hide.svg"
+        />
         <img v-else src="../../public/register-password-show.svg" />
       </div>
     </div>
     <div v-if="error.repassword" class="error">{{ error.repassword }}</div>
+    <div class="error">{{ error.comparepassword }}</div>
     <div class="agreement">
-      <input type="checkbox" />
-      <div><span>Üyelik koşullarını</span><span> ve kişisel verilerimin korunmasını kabul ediyorum.</span></div>
+      <input type="checkbox" v-model="agreement" />
+      <div>
+        <span>Üyelik koşullarını</span
+        ><span> ve kişisel verilerimin korunmasını kabul ediyorum.</span>
+      </div>
     </div>
+    <div v-if="error.agreements" class="error">{{ error.agreements }}</div>
     <div class="login-register">
-      <button :disabled="error">ÜYE OL</button>
+      <button>ÜYE OL</button>
     </div>
   </form>
 </template>
 
 <script>
 import { ref, watch } from "vue";
+import {
+  emailvalidator,
+  namesurnameValidator,
+  phoneValidator,
+  passwordValidator,
+  checkAgreement,
+} from "../helpers/validator";
 
 export default {
   setup() {
@@ -52,6 +102,7 @@ export default {
     const phoneNumber = ref("");
     const password = ref("");
     const rePassword = ref("");
+    const agreement = ref(false);
     const error = ref({
       name: null,
       surname: null,
@@ -59,84 +110,118 @@ export default {
       phone: null,
       password: null,
       repassword: null,
+      comparepassword: null,
+      agreements: null,
     });
     const signPasswordType = ref("password");
     const signRePasswordType = ref("password");
 
     const showSignPassword = () => {
-      signPasswordType.value = signPasswordType.value === "password" ? "text" : "password";
+      signPasswordType.value =
+        signPasswordType.value === "password" ? "text" : "password";
     };
     const showSignRePassword = () => {
-      signRePasswordType.value = signRePasswordType.value === "password" ? "text" : "password";
+      signRePasswordType.value =
+        signRePasswordType.value === "password" ? "text" : "password";
     };
 
-    const checkfirstName = watch(firstName, function (newValue) {
+    watch(firstName, function (newValue) {
+      const nameValidationError = namesurnameValidator(firstName.value);
       if (newValue === firstName.value) {
-        if (!firstName.value.match(/^[a-zA-Z0-9]{3,24}$/)) {
-          error.value.name = "special karakter girmeyin - 3 ve 24 arası yazın firstname";
-        } else {
-          error.value.name = null;
-        }
+        if (nameValidationError) error.value.name = nameValidationError;
+        else error.value.name = null;
       }
     });
-    const checksurName = watch(surName, function (newValue) {
+    watch(surName, function (newValue) {
+      const surnameValidationError = namesurnameValidator(surName.value);
       if (newValue === surName.value) {
-        if (!surName.value.match(/^[a-zA-Z0-9]{3,24}$/)) {
-          error.value.surname = "special karakter girmeyin - 3 ve 24 arası yazın surname";
-        } else {
-          error.value.surname = null;
-        }
+        if (surnameValidationError)
+          error.value.surname = surnameValidationError;
+        else error.value.surname = null;
       }
     });
-    const checkEmail = watch(email, function (newValue) {
+    watch(email, function (newValue) {
+      const emailValidationError = emailvalidator(email.value);
       if (newValue === email.value) {
-        if (!email.value.match(/^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/)) {
-          error.value.email = "geçerli bir email giriniz";
-        } else {
-          error.value.email = null;
-        }
+        if (emailValidationError) error.value.email = emailValidationError;
+        else error.value.email = null;
       }
     });
-    const checkPhone = watch(phoneNumber, function (newValue) {
+    watch(phoneNumber, function (newValue) {
+      const phoneValidationError = phoneValidator(phoneNumber.value);
       if (newValue === phoneNumber.value) {
-        if (!phoneNumber.value.match(/^\s*(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$/)) {
-          error.value.phone = "geçerli bir telefon numarası giriniz";
-        } else {
-          error.value.phone = null;
-        }
+        if (phoneValidationError) error.value.phone = phoneValidationError;
+        else error.value.phone = null;
       }
     });
     watch(password, function (newValue) {
+      const passwordValidationError = passwordValidator(password.value);
       if (newValue === password.value) {
-        if (!password.value.match(/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/)) {
-          error.value.password = "Minimum eight characters, at least one letter, one number and one special character:";
-        } else {
-          error.value.password = null;
-        }
+        if (passwordValidationError)
+          error.value.password = passwordValidationError;
+        else error.value.password = null;
       }
     });
     watch(rePassword, function (newValue) {
+      const repasswordValidationError = passwordValidator(rePassword.value);
       if (newValue === rePassword.value) {
-        if (!rePassword.value.match(/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/)) {
-          error.value.repassword = "Minimum eight characters, at least one letter, one number and one special character:";
-        } else {
-          error.value.repassword = null;
-        }
+        if (repasswordValidationError)
+          error.value.repassword = repasswordValidationError;
+        else error.value.repassword = null;
       }
     });
     const passwordCompare = () => {
       if (password.value != rePassword.value) {
-        error.value = "sifre uyumlu degil";
+        error.value.comparepassword = "Şifreler uyuşmuyor, tekrar deneyiniz";
       } else {
-        error.value = null;
+        error.value.comparepassword = null;
       }
     };
+    watch(agreement, function (newValue) {
+      const agreementValidationError = checkAgreement(agreement.value);
+      if (newValue === agreement.value) {
+        if (agreementValidationError) 
+          error.value.agreements = agreementValidationError;
+        else error.value.agreements = null;
+      }
+    });
 
     const registerSubmit = () => {
-      if (!checkfirstName || !checksurName || !checkEmail || !checkPhone) {
-        error.value = "bos bırakma aslan";
+      if (namesurnameValidator(firstName.value)) {
+        error.value.name = namesurnameValidator(firstName.value);
+      }
+      if (namesurnameValidator(surName.value)) {
+        error.value.surname = namesurnameValidator(surName.value);
+      }
+      if (phoneValidator(phoneNumber.value)) {
+        error.value.phone = phoneValidator(phoneNumber.value);
+      }
+
+      if (emailvalidator(email.value)) {
+        error.value.email = emailvalidator(email.value);
+      }
+      if (passwordValidator(rePassword.value)) {
+        error.value.repassword = passwordValidator(rePassword.value);
+      }
+      if (passwordValidator(password.value)) {
+        error.value.password = passwordValidator(password.value);
+      }
+      if (checkAgreement(agreement.value)) {
+        error.value.agreements = checkAgreement(agreement.value);
+      }
+      if (passwordCompare) {
+        return true;
       } else {
-        error.value = "napıyn";
+        error.value.comparepassword = null;
+        console.log(
+          firstName.value,
+          surName.value,
+          phoneNumber.value,
+          email.value,
+          rePassword.value,
+          password.value
+        );
+        return true;
       }
     };
 
@@ -144,14 +229,11 @@ export default {
       firstName,
       surName,
       email,
-      error,
       phoneNumber,
-      checkfirstName,
-      checksurName,
-      checkEmail,
-      checkPhone,
+      error,
       showSignPassword,
       showSignRePassword,
+      agreement,
       signPasswordType,
       signRePasswordType,
       password,
@@ -174,8 +256,8 @@ export default {
 .first-row > div:last-child {
   margin-right: 0;
 }
-.first-row input{
-    margin-bottom: 0;
+.first-row input {
+  margin-bottom: 0;
 }
 .agreement {
   display: flex;
@@ -184,6 +266,12 @@ export default {
 }
 .agreement span {
   font-size: 13px;
+}
+.agreement div > span:first-child {
+  color: #f2821a;
+}
+.agreement div > span:last-child {
+  font-weight: 700;
 }
 .agreement input {
   margin: 0;
