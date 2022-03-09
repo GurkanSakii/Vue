@@ -79,7 +79,21 @@
     </div>
     <div v-if="error.agreements" class="error">{{ error.agreements }}</div>
     <div class="login-register">
-      <button>ÜYE OL</button>
+      <button
+        :class="{
+          invalidsign:
+            error.name != null ||
+            error.surname != null ||
+            error.email != null ||
+            error.phone != null ||
+            error.password != null ||
+            error.repassword != null ||
+            error.comparepassword != null ||
+            error.agreements != null
+        }"
+      >
+        ÜYE OL
+      </button>
     </div>
   </form>
 </template>
@@ -180,7 +194,7 @@ export default {
     watch(agreement, function (newValue) {
       const agreementValidationError = checkAgreement(agreement.value);
       if (newValue === agreement.value) {
-        if (agreementValidationError) 
+        if (agreementValidationError)
           error.value.agreements = agreementValidationError;
         else error.value.agreements = null;
       }
@@ -209,18 +223,10 @@ export default {
       if (checkAgreement(agreement.value)) {
         error.value.agreements = checkAgreement(agreement.value);
       }
-      if (passwordCompare) {
-        return true;
+      if (password.value != rePassword.value) {
+        error.value.comparepassword = "Şifreler uyuşmuyor, tekrar deneyiniz";
       } else {
         error.value.comparepassword = null;
-        console.log(
-          firstName.value,
-          surName.value,
-          phoneNumber.value,
-          email.value,
-          rePassword.value,
-          password.value
-        );
         return true;
       }
     };

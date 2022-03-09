@@ -1,5 +1,5 @@
 /* custom font */
-@import url("https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap");
+@import url('https://fonts.googleapis.com/css?family=Poppins:400,500,600,700&display=swap');
 
 /* variables */
 :root {
@@ -12,7 +12,7 @@
 * {
   margin: 0;
   padding: 0;
-  font-family: "Lato", sans-serif;
+  font-family: "Poppins", sans-serif;
   color: var(--primary);
 }
 body {
@@ -66,6 +66,9 @@ button:disabled {
 .errorborder {
   border: 1px solid red;
 }
+.invalidsign{
+  opacity: 0.5;
+}
 
 /* forms */
 form {
@@ -88,7 +91,7 @@ textarea {
   background: #f5fafa;
   text-indent: 10px;
   border-radius: 25px;
-  padding-right: 50px;
+  padding-right: 5vh;
 }
 
 /* error text */
@@ -107,5 +110,5 @@ textarea {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 44px;
+  height: 48px;
 }
