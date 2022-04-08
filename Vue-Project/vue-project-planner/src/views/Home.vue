@@ -1,54 +1,59 @@
 <template>
-  <main>
-    <div class="logo-area">
-      <div class="logo-inner">
-        <img src="../assets/jpg1.jpg" />
-        <span class="search">Search App</span>
+  <div class="home">
+    <FilterNav :current="current" @filterChange="current = $event" />
+    <div v-if="projects.length">
+      <div v-for="project in filteredProjects" :key="project.id">
+      <SingleProject :proj="project" @delete="handleDelete" @complete="handleComplete" />
       </div>
     </div>
-    <SearchComponent />
-  </main>
+  </div>
 </template>
 
 <script>
-import SearchComponent from "@/components/SearchComponent.vue";
+import SingleProject from "@/components/SingleProject.vue";
+import FilterNav from "@/components/FilterNav.vue";
+
 export default {
   name: "Home",
   components: {
-    SearchComponent
+    SingleProject,
+    FilterNav,
   },
-  data() {
+ data() {
+    return {
+      projects: [],
+      current: 'all',
+    };
   },
-
-};
-</script>
-<style lang="scss" scoped>
-main {
-  max-width: 1150px;
-  margin: 0 auto;
-
-  .logo-area {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-
-    .logo-inner {
-      display: inline-flex;
-      flex-direction: column;
-
-      span {
-        position: relative;
-        right: -50px;
-        font-family: "Roboto";
-        font-style: normal;
-        font-weight: 700;
-        font-size: 18px;
-        line-height: 21px;
-        text-align: right;
-        color: #484848;
-      }
+  mounted() {
+    fetch('http://localhost:3000/projects')
+      .then(res => res.json())
+      .then(data => this.projects = data)
+      .catch(err => console.log(err))
+  },
+  methods: {
+    handleDelete(id) {
+      this.projects = this.projects.filter(project => {
+        return project.id !== id
+      })
+    },
+    handleComplete(id) {
+      let p = this.projects.find(project => {
+        return project.id === id
+      })
+      p.complete = !p.complete 
     }
-  }
+  },
+  computed: {
+    filteredProjects() {
+      if (this.current === 'completed') {
+        return this.projects.filter(project => project.complete)
+      }
+      if (this.current === 'ongoing') {
+        return this.projects.filter(project => !project.complete)
+      }
+      return this.projects
+    }
+  },
 }
-</style>
+</script>
